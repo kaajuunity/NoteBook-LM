@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NotebookLM Replica</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Google+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+        window.mermaid = mermaid;
+    </script>
+</head>
+
+<body class="dark-theme">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo-circle"></div>
+            <span class="notebook-title">Untitled notebook</span>
+        </div>
+        <div class="header-right">
+            <button class="icon-btn">Analytics</button>
+            <button class="icon-btn">Share</button>
+            <button class="icon-btn">Settings</button>
+            <div class="user-avatar">AI</div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- COLUMN 1: SOURCES -->
+        <aside class="col-sources">
+            <div class="col-header">
+                <h2>Sources</h2>
+                <button class="icon-btn-small">&#9664;</button>
+            </div>
+
+            <div class="sources-content">
+                <button class="add-source-btn" onclick="openUploadModal()">
+                    <span>+</span> Add source
+                </button>
+
+                <div class="deep-research-promo">
+                    <span class="sparkle-icon">&#10024;</span>
+                    <span>Try Deep Research for an in-depth report and new sources!</span>
+                </div>
+
+                <div class="search-bar">
+                    <span class="search-icon">&#128269;</span>
+                    <input type="text" placeholder="Search the web for new sources">
+                </div>
+
+                <div id="sourcesList" class="sources-list">
+                    <div class="sources-empty" id="sourcesEmpty">
+                        <div class="file-icon">&#128196;</div>
+                        <p>Saved sources will appear here</p>
+                        <small>Click Add source above to add PDFs, websites, text, videos or audio files.</small>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- COLUMN 2: CHAT -->
+        <main class="col-chat">
+            <div class="col-header">
+                <h2>Chat</h2>
+                <button class="icon-btn-small">&#9881;</button>
+            </div>
+
+            <div class="chat-area" id="chatArea">
+                <div class="chat-empty" id="chatEmpty">
+                    <div class="upload-icon-large">&#8593;</div>
+                    <h3>Add a source to get started</h3>
+                    <button class="pill-btn" onclick="openUploadModal()">Upload a source</button>
+                </div>
+
+                <div class="chat-history hidden" id="chatHistory">
+                    <div class="message system">
+                        Hello! ask me anything about your sources.
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-wrapper">
+                <input type="text" id="chatInput" placeholder="Type a message..." onkeypress="handleEnter(event)">
+                <button onclick="sendMessage()" class="send-btn" id="sendBtn">&#10145;</button>
+            </div>
+            <div class="disclaimer">NotebookLM can be inaccurate; please double-check its responses.</div>
+        </main>
+
+        <!-- COLUMN 3: STUDIO -->
+        <aside class="col-studio">
+            <div class="col-header">
+                <h2>Studio</h2>
+                <button class="icon-btn-small">&#9675;</button>
+            </div>
+
+            <div class="studio-content">
+                <!-- Audio Overview Card -->
+                <div class="audio-card">
+                    <div class="audio-header">
+                        <h3>Audio Overview</h3>
+                        <button class="icon-btn-small">&#8942;</button>
+                    </div>
+                    <div class="audio-controls">
+                        <button class="play-btn" onclick="generateAudio()" id="audioBtn">&#9654; Play</button>
+                        <div id="audioLoading" class="hidden">Generating...</div>
+                    </div>
+                    <div id="audioPlayerContainer" class="hidden" style="margin-top: 10px;">
+                        <audio id="audioPlayer" controls style="width: 100%;"></audio>
+                    </div>
+                </div>
+
+                <!-- Studio Grid -->
+                <div class="studio-grid" id="studioGrid">
+                    <div class="studio-item" onclick="generateVideo()">
+                        <span class="studio-icon">&#127929;</span>
+                        <span>Video Overview</span>
+                    </div>
+                    <div class="studio-item" onclick="generateStudy('flowchart')">
+                        <span class="studio-icon">&#129504;</span>
+                        <span>Mind Map</span>
+                    </div>
+                    <div class="studio-item" onclick="comingSoon()">
+                        <span class="studio-icon">&#128196;</span>
+                        <span>Reports</span>
+                    </div>
+                    <div class="studio-item" onclick="generateStudy('flashcard')">
+                        <span class="studio-icon">&#128450;</span>
+                        <span>Flashcards</span>
+                    </div>
+                    <div class="studio-item" onclick="generateStudy('quiz')">
+                        <span class="studio-icon">&#128221;</span>
+                        <span>Quiz</span>
+                    </div>
+                    <div class="studio-item" onclick="comingSoon()">
+                        <span class="studio-icon">&#128202;</span>
+                        <span>Infographic</span>
+                    </div>
+                    <div class="studio-item" onclick="generateSlides()">
+                        <span class="studio-icon">&#127902;</span>
+                        <span>Slide deck</span>
+                    </div>
+                </div>
+
+                <div class="studio-footer" id="studioFooter">
+                    <p>Studio output will be saved here.</p>
+                </div>
+
+                <div id="studyOutput" class="study-output"></div>
+                
+                <!-- Flashcard Viewer in Studio -->
+                <div id="flashcardViewer" class="flashcard-viewer hidden"></div>
+            </div>
+
+
+        </aside>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Audio and Video Overviews from<br><span style="color:#a8c7fa">your documents</span></h2>
+                <button class="close-btn" onclick="closeUploadModal()">&times;</button>
+            </div>
+
+            <div class="modal-search">
+                <span class="search-icon">&#128269;</span>
+                <input type="text" placeholder="Search the web for new sources">
+            </div>
+
+            <div class="modal-drop-area">
+                <p>or drop your files here</p>
+                <div class="upload-options">
+                    <div class="upload-option" onclick="document.getElementById('fileInput').click()">
+                        <span class="icon">&#128228;</span> Upload files
+                    </div>
+                    <div class="upload-option" onclick="comingSoon()">
+                        <span class="icon">&#128279;</span> Websites
+                    </div>
+                    <div class="upload-option" onclick="comingSoon()">
+                        <span class="icon">&#128190;</span> Drive
+                    </div>
+                    <div class="upload-option" onclick="comingSoon()">
+                        <span class="icon">&#128203;</span> Copied text
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="file" id="fileInput" accept=".pdf,.txt" style="display:none" onchange="uploadFile()">
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
