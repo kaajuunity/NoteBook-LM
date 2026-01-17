@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-genai.configure(api_key=os.getenv("AIzaSyCId5GPcvi30LCOW7We7U0wVxIBJS53hMo"))
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 print("Available Gemini Models:\n")
 print("-" * 80)
